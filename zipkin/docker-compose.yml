@@ -1,0 +1,33 @@
+version: '3.1'
+services:
+  cassandra-dev:
+    image: cassandra:3.11.6
+    container_name: cassandra-dev
+    environment:
+      - CASSANDRA_BROADCAST_ADDRESS=cassandra-dev
+      - JVM_OPTS=-Xmx800m -Xms400m
+        #- LOCAL_JMX=no
+    ports:
+      - 7000
+        #restart: always
+    volumes:
+      - /home/robbie/workspace/zipkin/docker/data/cassandra:/var/lib/cassandra 
+      - /home/robbie/workspace/zipkin/docker/config/cassandra:/etc/cassandra
+      #- /home/robbie/workspace/cassandra/docker-2n/config/cassandra-1/cassandra.yaml:/etc/cassandra/cassandra.yaml
+      #- /home/robbie/workspace/cassandra/docker-2n/config/cassandra-1/logback.xml:/etc/cassandra/logback.xml
+  zipkin-dev:
+    image: openzipkin/zipkin:2.21
+    container_name: zipkin-dev
+    environment:
+      - STORAGE_TYPE=cassandra3
+      - CASSANDRA_CONTACT_POINTS=cassandra-dev
+    ports:
+        - 9411:9411
+        #volumes:
+        #- /home/robbie/workspace/cassandra/docker-2n/data/cassandra-2:/var/lib/cassandra 
+        #- /home/robbie/workspace/cassandra/docker-2n/config/cassandra-2/cassandra.yaml:/etc/cassandra/cassandra.yaml
+        #- /home/robbie/workspace/cassandra/docker-2n/config/cassandra-2/logback.xml:/etc/cassandra/logback.xml
+    depends_on:
+      - cassandra-dev
+        #restart: always
+

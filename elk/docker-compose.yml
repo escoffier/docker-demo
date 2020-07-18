@@ -1,0 +1,34 @@
+version: '3.1'
+services:
+  elk-elasticsearch:
+    image: elasticsearch:7.6.2
+    container_name: elk-elasticsearch
+    environment:
+      - discovery.type=single-node
+    networks:
+      - my_net
+    ports:
+      - 9200:9200
+      - 9300:9300
+        #restart: always
+    #volumes:
+    #  - /home/robbie/workspace/mysql/replication/master/datadir:/var/lib/mysql
+  elk-kibana:
+    image: kibana:7.6.2
+    container_name: elk-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elk-elasticsearch:9200
+      #- JVM_OPTS=-Xmx800m -Xms400m
+    networks:
+      - my_net
+    ports:
+      - 5601:5601 
+    volumes:
+      - /home/robbie/workspace/docker/docker-demo/elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    depends_on:
+      - elk-elasticsearch
+        #restart: always
+
+networks:
+  my_net:
+    external: true

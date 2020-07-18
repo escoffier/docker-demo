@@ -1,0 +1,36 @@
+client:
+mysql -h 127.0.0.1 -P 3306 -u root -p
+
+
+docker run:
+sudo docker run --name emp-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=19811981 -d mysql:8.0.18
+
+sudo docker run --name test-mysql -v /home/robbie/workspace/mysql/sql:/docker-entrypoint-initdb.d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=19811981 -d mysql:8.0.18
+
+
+sudo docker exec -it dev-mysql bash
+
+sudo docker exec -it mysql-master bash
+
+sudo docker run -it --rm mysql:8.0.18 --verbose --help
+
+change master to master_host='192.168.254.131',master_user='repl',master_password='123456',master_log_file='binlog.000007',master_log_pos=67715809;
+
+change master to master_host='mysql-master',master_user='repl',master_password='123456',master_log_file='binlog.000003',master_log_pos=71249655,get_master_public_key=1;
+
+restore:
+sudo docker exec -i mysql-master sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD"' < /home/robbie/workspace/mysql/all-databases.sql
+sudo docker exec -i mysql-slave sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD"' < /home/robbie/workspace/mysql/all-databases.sql
+
+dump:
+docker exec dev-mysql sh -c 'exec mysqldump --all-databases -uroot -p"$MYSQL_ROOT_PASSWORD"' > /home/robbie/workspace/mysql/all-databases.sql
+
+创建数据库同时创建数据库、导入数据
+sudo docker run --name test-1-mysql -v /home/robbie/workspace/mysql/sql4docker:/docker-entrypoint-initdb.d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=19811981 -d mysql:8.0.18
+
+
+sudo docker run --name emp-mysql -p 3306:3306 -v /home/robbie/workspace/mysql/datadir:/var/lib/mysql  -e MYSQL_ROOT_PASSWORD=19811981 -d mysql:8.0.18
+
+docker exec -i test-mysql sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD"' < /home/robbie/workspace/mysql/sql/load_departments.dump
+
+sudo docker exec test-mysql sh -c 'exec mysqldump --all-databases -uroot -p"$MYSQL_ROOT_PASSWORD"' > test.sql

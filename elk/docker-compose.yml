@@ -31,13 +31,19 @@ services:
   elk-logstash:
     image: logstash:7.6.2
     container_name: elk-logstash
+    environment:
+      - MONITORING_LASTICSEARCH_HOSTS=http://elk-elasticsearch:9200     
     volumes:
-      - ./logstash/logstash.conf:/usr/share/logstash/config/logstash.conf
+            #- ./logstash/logstash.conf:/usr/share/logstash/config/logstash.conf
+      - ./logstash/pipeline/:/usr/share/logstash/pipeline/
+      - ./logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
     networks:
       - my_net
     ports:
       - 5044:5044
-        
+    depends_on:
+      - elk-elasticsearch
+       
 networks:
   my_net:
     external: true
